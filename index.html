@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="socket">
+
+<head>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <title>Socket.IO chat</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font: 13px Helvetica, Arial; }
+  form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+  form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+  form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+  #messages { list-style-type: none; margin: 0; padding: 0; }
+  #messages li { padding: 5px 10px; }
+  #messages li:nth-child(odd) { background: #eee; }
+</style>
+</head>
+
+<!-- attach it to the view model, using the "controllerName as vm" syntax. -->
+<body ng-controller="socketController as vm">
+  <ul ng-repeat="msg in vm.messages" id="messages">
+    <li>{{msg}}</li>
+  </ul>
+  <form ng-submit="vm.sendMessage()">
+      <input ng-model="vm.message" id="m" autocomplete="off"  /><button>Send</button>
+  </form>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-resource.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  var socket = io()
+
+  angular
+    .module("socket", [])
+    .controller("socketController", ["$scope", SocketControllerFunction])
+
+    function SocketControllerFunction($scope) {
+      // to retain our scope, just in case we define this here
+      var vm = this
+      vm.messages = []
+
+      // $apply forces the refresh
+      socket.on('chat message', function(msg) {
+        vm.messages.push(msg)
+        console.log(vm.messages)
+        $scope.$apply()
+      })
+
+      // socket.emit means send out something
+      vm.sendMessage = function() {
+        socket.emit('chat message', vm.message)
+        // update the view so that it is blank
+        vm.message = " "
+      }
+    }
+</script>
+</html>
