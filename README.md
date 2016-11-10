@@ -1,2 +1,2 @@
 # websocket-app
-My chat app  - My first ever WebSocket app!
+Chat.me  - My first ever WebSocket app!
